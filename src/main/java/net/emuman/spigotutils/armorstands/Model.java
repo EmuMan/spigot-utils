@@ -1,6 +1,7 @@
 package net.emuman.spigotutils.armorstands;
 
 import org.bukkit.Location;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +29,8 @@ public class Model {
      * @param location the location of the ArmorStandObject.
      * @param size     the size of the ArmorStandObject.
      */
-    public void addObject(Location location, ArmorStandObject.Size size) {
-        objects.add(new ArmorStandObject(location, size));
+    public void addObject(ItemStack item, Location location, ArmorStandObject.Size size) {
+        objects.add(new ArmorStandObject(item, location, size));
     }
 
 }
