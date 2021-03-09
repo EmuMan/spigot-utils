@@ -1,4 +1,4 @@
-package net.emuman.spigottesting.utils;
+package net.emuman.spigotutils.gui;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
@@ -20,6 +20,8 @@ public class PartialDynamicSidebar extends BukkitRunnable {
     private final Map<Integer, Supplier<String>> prefixUpdaters;
     private final Map<Integer, Supplier<String>> suffixUpdaters;
 
+    private Supplier<String> titleUpdater = null;
+
     public PartialDynamicSidebar(String id, String title, Scoreboard board) {
         this.board = board;
         this.objective = board.registerNewObjective(id, "dummy", title);
@@ -39,6 +41,7 @@ public class PartialDynamicSidebar extends BukkitRunnable {
     public void addLine(String body) {
         if (teams.size() > 15) return;
         if (body.length() > 16) body = body.substring(0, 16);
+        if (lines.contains(body)) return; // cannot have duplicates
         lines.add(body);
         Team newTeam = board.registerNewTeam("sidebar_row_" + teams.size());
         teams.add(newTeam);
@@ -76,6 +79,7 @@ public class PartialDynamicSidebar extends BukkitRunnable {
     public void removeUpdaters(int line) {
         prefixUpdaters.remove(line);
         suffixUpdaters.remove(line);
+        removeTitleUpdater();
     }
 
     public void blankFullLine(int line) {
@@ -94,6 +98,14 @@ public class PartialDynamicSidebar extends BukkitRunnable {
     public void setTitle(String title) {
         this.title = title;
         this.objective.setDisplayName(title);
+    }
+
+    public void setTitle(Supplier<String> updater) {
+        this.titleUpdater = updater;
+    }
+
+    public void removeTitleUpdater() {
+        titleUpdater = null;
     }
 
     public String getTitle() {
@@ -117,5 +129,6 @@ public class PartialDynamicSidebar extends BukkitRunnable {
         // update the corresponding lines for every updater
         prefixUpdaters.forEach((line, updater) -> setLinePrefix(line, updater.get()));
         suffixUpdaters.forEach((line, updater) -> setLineSuffix(line, updater.get()));
+        if (titleUpdater != null) setTitle(titleUpdater.get());
     }
 }

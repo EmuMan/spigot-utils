@@ -1,4 +1,4 @@
-package net.emuman.spigottesting.utils;
+package net.emuman.spigotutils.gui;
 
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.Bukkit;
