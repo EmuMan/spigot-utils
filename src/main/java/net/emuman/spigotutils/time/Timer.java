@@ -18,8 +18,8 @@ public abstract class Timer extends Stopwatch {
     }
 
     @Override
-    public void run() {
-        super.run();
+    public void increment() {
+        super.increment();
         if (getTicks() >= duration) {
             stop();
         }

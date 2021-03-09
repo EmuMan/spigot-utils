@@ -3,10 +3,12 @@ package net.emuman.spigotutils.time;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class Stopwatch extends BukkitRunnable {
+// Extending BukkitRunnable forces us to expose the run method, which is undesirable.
+public class Stopwatch {
 
     private long ticks;
     private boolean running;
+    private BukkitRunnable runnable;
 
     /**
      * Creates a new Stopwatch.
@@ -15,14 +17,21 @@ public class Stopwatch extends BukkitRunnable {
      */
     public Stopwatch(JavaPlugin plugin) {
         ticks = 0;
-        this.runTaskTimer(plugin, 0, 1);
+        start();
+        // I don't think I can use lambda expressions here unfortunately
+        this.runnable = new BukkitRunnable() {
+            @Override
+            public void run() {
+                increment();
+            }
+        };
+        this.runnable.runTaskTimer(plugin, 0, 1);
     }
 
     /**
      * Called by Bukkit/Spigot every tick. Should not be called by user.
      */
-    @Override
-    public void run() {
+    public void increment() {
         if (running) ticks += 1;
     }
 
