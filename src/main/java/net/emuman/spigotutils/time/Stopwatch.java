@@ -3,8 +3,11 @@ package net.emuman.spigotutils.time;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
-// Extending BukkitRunnable forces us to expose the run method, which is undesirable.
+/**
+ * A stopwatch that keeps track of how many ticks have passed (tick count can also be stopped/started/altered).
+ */
 public class Stopwatch {
+    // Extending BukkitRunnable forces us to expose the BukkitRunnable#run method, which is undesirable.
 
     private long ticks;
     private boolean running;
@@ -29,7 +32,7 @@ public class Stopwatch {
     }
 
     /**
-     * Called by Bukkit/Spigot every tick. Should not be called by user.
+     * Called by Bukkit every tick. Should not be called by user.
      */
     public void increment() {
         if (running) ticks += 1;
@@ -50,18 +53,22 @@ public class Stopwatch {
     }
 
     /**
-     * Returns whether the stopwatch is running.
-     *
      * @return true if the stopwatch is running, false if not.
      */
     public boolean isRunning() {
         return running;
     }
 
+    /**
+     * @return the number of ticks the stopwatch has been running.
+     */
     public long getTicks() {
         return ticks;
     }
 
+    /**
+     * @param ticks the number of ticks to set the stopwatch to.
+     */
     public void setTicks(long ticks) {
         this.ticks = ticks;
     }

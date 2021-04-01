@@ -1,5 +1,25 @@
 main: net.emuman.spigotutils.SpigotUtilsTestPlugin
 name: SpigotUtilsTestPlugin
-version: 1.0
+version: ${project.version}
 api-version: 1.16
 author: EmuMan
+
+commands:
+  testnpc:
+    description: Adds a test NPC to the world
+    usage: /<command>
+  testsidebar:
+    description: Adds a test sidebar to the player
+    usage: /<command>
+  testuuid:
+    description: Tests the uuid retrieval of an offline player
+    usage: /<command> <name>
+  testworld:
+    description: Tests the world generation
+    usage: /<command>
+  testasm:
+    description: Tests the armor stand model system
+    usage: /<command>
+  testvillager:
+    description: Tests the villager building system
+    usage: /<command>

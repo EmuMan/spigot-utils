@@ -5,12 +5,26 @@ import org.bukkit.ChatColor;
 
 import java.util.List;
 
+/**
+ * A class that allows text to be wrapped in an animation, represented by a String supplier.
+ *
+ * A wipe animation is characterized by a linear transition between two colors, with any number of specified intermediaries.
+ */
 public class TextWipeAnimation extends TextAnimation {
 
     private final ChatColor color1;
     private final ChatColor color2;
     private final List<ChatColor> intermediaries;
 
+    /**
+     * Creates a new TextWipeAnimation. The period is only used for optional external reference and is not mandatory.
+     *
+     * @param text           the text to be animated.
+     * @param color1         the primary color of the text (before the wipe).
+     * @param color2         the secondary color of the text (after the wipe).
+     * @param intermediaries the set of colors to act as intermediaries between the two colors.
+     * @param period         the period of the text animation.
+     */
     public TextWipeAnimation(String text, ChatColor color1, ChatColor color2, List<ChatColor> intermediaries, int period) {
         super(text, period);
         this.color1 = color1;
@@ -19,18 +33,44 @@ public class TextWipeAnimation extends TextAnimation {
         this.maxStage = text.length() + 1 + (intermediaries == null ? 0 : intermediaries.size());
     }
 
+    /**
+     * Creates a new TextWipeAnimation, with no given period.
+     *
+     * @param text           the text to be animated.
+     * @param color1         the primary color of the text (before the wipe).
+     * @param color2         the secondary color of the text (after the wipe).
+     * @param intermediaries the set of colors to act as intermediaries between the two colors.
+     */
     public TextWipeAnimation(String text, ChatColor color1, ChatColor color2, List<ChatColor> intermediaries) {
         this(text, color1, color2, intermediaries, 3);
     }
 
+    /**
+     * Creates a new TextWipeAnimation with no intermediaries. The period is only used for optional external reference and is not mandatory.
+     *
+     * @param text           the text to be animated.
+     * @param color1         the primary color of the text (before the wipe).
+     * @param color2         the secondary color of the text (after the wipe).
+     * @param period         the period of the text animation.
+     */
     public TextWipeAnimation(String text, ChatColor color1, ChatColor color2, int period) {
         this(text, color1, color2, null, period);
     }
 
+    /**
+     * Creates a new TextWipeAnimation, with no given intermediaries or period.
+     *
+     * @param text           the text to be animated.
+     * @param color1         the primary color of the text (before the wipe).
+     * @param color2         the secondary color of the text (after the wipe).
+     */
     public TextWipeAnimation(String text, ChatColor color1, ChatColor color2) {
         this(text, color1, color2, null, 3);
     }
 
+    /**
+     * @return the next string in the animated sequence.
+     */
     @Override
     public String getNext() {
         int numberOfIntermediaries = intermediaries == null ? 0 : intermediaries.size();

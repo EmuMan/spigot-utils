@@ -7,10 +7,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A basic menu that allows for several menu pages and button additions.
+ */
 public class BasicMenu implements Listener {
 
-    private List<MenuPage> pages;
+    private final List<MenuPage> pages;
 
+    /**
+     * Creates a new BasicMenu.
+     */
     public BasicMenu() {
         this.pages = new ArrayList<>();
     }
@@ -20,14 +26,22 @@ public class BasicMenu implements Listener {
      *
      * @param rows  the number of rows in the new page.
      * @param title the name of the page.
-     * @return      the index of the newly created page.
+     * @return      the newly created page.
      */
-    public int addPage(int rows, String title) {
+    public MenuPage addPage(int rows, String title) {
         assert rows > 0 && rows <= 6;
-        pages.add(new MenuPage(this, rows, title));
-        return pages.size() - 1;
+        MenuPage newPage = new MenuPage(this, rows, title);
+        pages.add(newPage);
+        return newPage;
     }
 
+    /**
+     * Gets the page after the specified page, wrapping if specified.
+     *
+     * @param currentPage the specified current page.
+     * @param wrap        true if wrapping (last -> first), false otherwise.
+     * @return            the page after the specified current page (returns null if page is last and wrapping is false).
+     */
     public MenuPage pageAfter(MenuPage currentPage, boolean wrap) {
         int index = pages.indexOf(currentPage);
         if (index == pages.size() - 1) {
@@ -42,6 +56,13 @@ public class BasicMenu implements Listener {
         }
     }
 
+    /**
+     * Gets the page before the specified page, wrapping if specified.
+     *
+     * @param currentPage the specified current page.
+     * @param wrap        true if wrapping (first -> last), false otherwise.
+     * @return            the page before the specified current page (returns null if page is first and wrapping is false).
+     */
     public MenuPage pageBefore(MenuPage currentPage, boolean wrap) {
         int index = pages.indexOf(currentPage);
         if (index == 0) {
@@ -57,19 +78,34 @@ public class BasicMenu implements Listener {
     }
 
     /**
-     * Gets the size of the menu, in pages.
-     *
      * @return the number of pages in the menu.
      */
     public int getSize() {
         return pages.size();
     }
 
+    /**
+     * Gets the page with the specified index.
+     *
+     * @param index the index of the page to retrieve.
+     * @return      the page with the specified index, null if not found.
+     */
+    public MenuPage getPage(int index) {
+        return pages.get(index);
+    }
+
+    /**
+     * Called by the MenuManager listener when an inventory is clicked. Generally does not need to be called manually.
+     *
+     * @param event the InventoryClickEvent associated with the click.
+     */
     @EventHandler
     public void onClick(InventoryClickEvent event) {
         // If there is a page with the clicked inventory, send the event to that page.
         for (MenuPage page : pages) {
-            if (event.getClickedInventory().equals(page.getInv())) {
+            if (event.getClickedInventory() != null &&
+                    (event.getClickedInventory().equals(page.getInv()) ||
+                            event.getWhoClicked().getOpenInventory().getTopInventory().equals(page.getInv()))) {
                 page.onClick(event);
                 return;
             }

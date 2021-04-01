@@ -5,22 +5,18 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * A simple button that allows for a specific menu page to be selected.
+ * A simple button that does nothing upon clicking it.
  */
-public class PageSelectButton extends MenuButton {
-
-    private MenuPage targetPage;
+public class DummyButton extends MenuButton {
 
     /**
-     * Creates a new MenuButton.
+     * Creates a new DummyButton.
      *
      * @param page        the page that the button is on.
      * @param displayItem the item displayed as the button.
-     * @param targetPage  the page that the button points to.
      */
-    public PageSelectButton(MenuPage page, ItemStack displayItem, MenuPage targetPage) {
+    public DummyButton(MenuPage page, ItemStack displayItem) {
         super(page, displayItem);
-        this.targetPage = targetPage;
     }
 
     /**
@@ -29,8 +25,6 @@ public class PageSelectButton extends MenuButton {
      * @param event the InventoryClickEvent associated with the click.
      */
     @Override
-    public void onClick(InventoryClickEvent event) {
-        event.getWhoClicked().openInventory(targetPage.getInv());
-    }
+    public void onClick(InventoryClickEvent event) {}
 
 }

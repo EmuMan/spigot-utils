@@ -4,6 +4,9 @@ import net.emuman.spigotutils.menu.MenuPage;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+/**
+ * A simple button that navigates to the previous page in the menu.
+ */
 public class PreviousPageButton extends MenuButton {
 
     private boolean wrap;
@@ -20,6 +23,11 @@ public class PreviousPageButton extends MenuButton {
         this.wrap = wrap;
     }
 
+    /**
+     * Called by the menu page when this button is clicked. Should generally not be called by user.
+     *
+     * @param event the InventoryClickEvent associated with the click.
+     */
     @Override
     public void onClick(InventoryClickEvent event) {
         MenuPage previousPage = getPage().previousPage(wrap);

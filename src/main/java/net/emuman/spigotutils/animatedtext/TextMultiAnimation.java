@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+
+/**
+ * A class that allows text to be wrapped in an animation, represented by a String supplier.
+ *
+ * A multi animation is characterized by several other animations run in or out of sequence.
+ */
 public class TextMultiAnimation extends TextAnimation {
 
     public enum OrderType {
@@ -23,6 +29,12 @@ public class TextMultiAnimation extends TextAnimation {
     private int currentDirection; // For use with the ping-pong order type
     private final Random random;
 
+    /**
+     * Creates a new TextMultiAnimation.
+     *
+     * @param animations the list of animations to be cycled through.
+     * @param orderType  the order in which to cycle through the animations.
+     */
     public TextMultiAnimation(List<TextAnimation> animations, OrderType orderType) {
         super(animations.size() > 0 ? animations.get(0).getRawText() : null);
         this.animations = animations;
@@ -32,15 +44,24 @@ public class TextMultiAnimation extends TextAnimation {
         this.random = new Random();
     }
 
+    /**
+     * @param orderType the new order in which to cycle through the animations.
+     */
     private void setOrderType(OrderType orderType) {
         this.orderType = orderType;
     }
 
+    /**
+     * @return the current period, represented by the set period of the current animation.
+     */
     @Override
     public int getPeriod() {
         return animations.get(getStage()).getPeriod();
     }
 
+    /**
+     * Advances the animation stage, taking into account the max stage limit, and swapping animations if necessary.
+     */
     @Override
     public void advance() {
         switch (orderType) {
@@ -66,6 +87,9 @@ public class TextMultiAnimation extends TextAnimation {
         }
     }
 
+    /**
+     * @return the next string in the animated sequence.
+     */
     @Override
     public String getNext() {
         if (animations.size() == 0) return "";
