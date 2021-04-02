@@ -39,7 +39,7 @@ public class BasicMenu implements Listener {
      * Gets the page after the specified page, wrapping if specified.
      *
      * @param currentPage the specified current page.
-     * @param wrap        true if wrapping (last -> first), false otherwise.
+     * @param wrap        true if wrapping (last page points to first page), false otherwise.
      * @return            the page after the specified current page (returns null if page is last and wrapping is false).
      */
     public MenuPage pageAfter(MenuPage currentPage, boolean wrap) {
@@ -60,7 +60,7 @@ public class BasicMenu implements Listener {
      * Gets the page before the specified page, wrapping if specified.
      *
      * @param currentPage the specified current page.
-     * @param wrap        true if wrapping (first -> last), false otherwise.
+     * @param wrap        true if wrapping (first page points to last page), false otherwise.
      * @return            the page before the specified current page (returns null if page is first and wrapping is false).
      */
     public MenuPage pageBefore(MenuPage currentPage, boolean wrap) {

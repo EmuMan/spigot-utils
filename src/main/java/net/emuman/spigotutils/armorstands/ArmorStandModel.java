@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -52,7 +51,8 @@ public class ArmorStandModel extends ArmorStandLocationUser {
     /**
      * Adds an ArmorStandObject to the model.
      *
-     * @param object the ArmorStandObject to add to the model.
+     * @param object       the ArmorStandObject to add to the model.
+     * @param displacement the displacement of the armor stand object relative to the model.
      */
     public void addObject(ArmorStandObject object, ArmorStandLocation displacement) {
         objects.add(new ASOLocPair(object, displacement));
@@ -62,6 +62,7 @@ public class ArmorStandModel extends ArmorStandLocationUser {
      * Adds an ArmorStandObject to the model.
      *
      * @param object the ArmorStandObject to add to the model.
+     * @param displacement the displacement of the armor stand object relative to the model.
      */
     public void addObject(ArmorStandObject object, Vector displacement) {
         objects.add(new ASOLocPair(object, new ArmorStandLocation(
@@ -74,6 +75,7 @@ public class ArmorStandModel extends ArmorStandLocationUser {
      * @param item         the item for the ArmorStandObject to be holding/wearing.
      * @param displacement the relative displacement of the ArmorStandObject.
      * @param size         the size of the ArmorStandObject.
+     * @return             this same instance for repeated calls.
      */
     public ArmorStandObject addObject(ItemStack item, ArmorStandLocation displacement, ArmorStandObject.Size size) {
         ArmorStandObject aso = new ArmorStandObject(plugin, item, getCompensatedLocation(displacement), size);

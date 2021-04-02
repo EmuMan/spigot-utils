@@ -22,6 +22,8 @@ public class ItemShopButton extends MenuButton {
      *
      * @param page        the page that the button is on.
      * @param displayItem the item displayed as the button.
+     * @param shopItem    the item that is purchased with the button.
+     * @param itemCosts   the cost of the item, in [item, amount] pairs.
      */
     public ItemShopButton(MenuPage page, ItemStack displayItem, ItemStack shopItem, Map<ItemStack, Integer> itemCosts) {
         super(page, displayItem);

@@ -16,7 +16,7 @@ public class NextPageButton extends MenuButton {
      *
      * @param page        the page that the button is on.
      * @param displayItem the item displayed as the button.
-     * @param wrap        whether to wrap the page selection (last page -> first page).
+     * @param wrap        whether to wrap the page selection (last page points to first page).
      */
     public NextPageButton(MenuPage page, ItemStack displayItem, boolean wrap) {
         super(page, displayItem);
