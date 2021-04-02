@@ -40,3 +40,5 @@ buildNumber.properties
 **/.idea/usage.statistics.xml
 **/.idea/tasks.xml
 **/.idea/shelf/
+
+update_command_builder.bat

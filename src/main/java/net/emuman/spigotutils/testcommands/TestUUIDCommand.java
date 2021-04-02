@@ -1,16 +1,15 @@
 package net.emuman.spigotutils.testcommands;
 
-import io.github.emuman.commandbuilder.CommandTraceLog;
-import io.github.emuman.commandbuilder.EndNode;
-import io.github.emuman.commandbuilder.NodeBase;
-import io.github.emuman.commandbuilder.SingleStringNode;
-import io.github.emuman.commandbuilder.exceptions.CommandStructureException;
+import net.emuman.commandbuilder.CommandTraceLog;
+import net.emuman.commandbuilder.EndNode;
+import net.emuman.commandbuilder.NodeBase;
+import net.emuman.commandbuilder.SingleStringNode;
+import net.emuman.commandbuilder.exceptions.CommandStructureException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 import java.util.HashMap;
 import java.util.Map;
