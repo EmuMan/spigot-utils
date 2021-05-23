@@ -33,7 +33,7 @@ public class NPC {
     private static final int RENDER_DISTANCE = 50;
 
     private EntityPlayer npc;
-    private final JavaPlugin plugin;
+    protected final JavaPlugin plugin;
     private final Set<Player> displayedFor;
     private final Set<Player> inRenderDistance;
     private final String name;
@@ -262,6 +262,29 @@ public class NPC {
         double dy = playerLocation.getY() - npcLocation.y;
         double dz = playerLocation.getZ() - npcLocation.z;
         return ((int) (dx * dx + dy * dy + dz * dz) < RENDER_DISTANCE * RENDER_DISTANCE);
+    }
+
+    public void moveTo(Location location) {
+        boolean isTeleport = (Math.abs(location.getX() - npc.locX()) > 8.0d ||
+                Math.abs(location.getY() - npc.locY()) > 8.0d ||
+                Math.abs(location.getZ() - npc.locZ()) > 8.0d);
+        Location oldLocation = new Location(location.getWorld(), npc.locX(), npc.locY(), npc.locZ());
+        npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+        for (Player player : inRenderDistance) {
+            PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+            if (isTeleport) {
+                connection.sendPacket(new PacketPlayOutEntityTeleport(npc));
+            } else {
+                connection.sendPacket(new PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook(npc.getId(),
+                        (short) ((location.getX() * 32.0d - oldLocation.getX() * 32.0d) * 128),
+                        (short) ((location.getY() * 32.0d - oldLocation.getY() * 32.0d) * 128),
+                        (short) ((location.getZ() * 32.0d - oldLocation.getZ() * 32.0d) * 128),
+                        (byte) (location.getYaw() * 256 / 360),
+                        (byte) (location.getPitch() * 256 / 360),
+                        false));
+                connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
+            }
+        }
     }
 
     /**
