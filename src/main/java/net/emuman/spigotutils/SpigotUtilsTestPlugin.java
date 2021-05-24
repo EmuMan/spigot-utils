@@ -1,6 +1,5 @@
 package net.emuman.spigotutils;
 
-import net.emuman.spigotutils.items.ItemStackBuilder;
 import net.emuman.spigotutils.menu.BasicMenu;
 import net.emuman.spigotutils.menu.MenuManager;
 import net.emuman.spigotutils.menu.MenuPage;

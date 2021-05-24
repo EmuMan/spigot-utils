@@ -1,6 +1,6 @@
 package net.emuman.spigotutils.menu.buttons;
 
-import net.emuman.spigotutils.items.ItemStackBuilder;
+import net.emuman.spigotutils.ItemStackBuilder;
 import net.emuman.spigotutils.menu.MenuPage;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;

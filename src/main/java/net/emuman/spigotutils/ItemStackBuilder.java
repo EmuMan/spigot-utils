@@ -1,4 +1,4 @@
-package net.emuman.spigotutils.items;
+package net.emuman.spigotutils;
 
 import org.bukkit.Color;
 import org.bukkit.Material;
