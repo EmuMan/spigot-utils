@@ -35,14 +35,14 @@ public class Stopwatch {
      * Called by Bukkit every tick. Should not be called by user.
      */
     public void increment() {
-        if (running) ticks += 1;
+        if (running && !isCancelled()) ticks += 1;
     }
 
     /**
      * Starts the stopwatch. If the stopwatch is already running, nothing is changed.
      */
     public void start() {
-        running = true;
+        if (!isCancelled()) running = true;
     }
 
     /**
@@ -71,6 +71,28 @@ public class Stopwatch {
      */
     public void setTicks(long ticks) {
         this.ticks = ticks;
+    }
+
+    /**
+     * Permanently stops the underlying Bukkit runnable. Cannot be reversed.
+     */
+    public void cancel() {
+        stop();
+        runnable.cancel();
+    }
+
+    /**
+     * @return true if the underlying Bukkit runnable has been cancelled.
+     */
+    public boolean isCancelled() {
+        return runnable.isCancelled();
+    }
+
+    /**
+     * @return the underlying Bukkit runnable.
+     */
+    public BukkitRunnable getRunnable() {
+        return runnable;
     }
 
 }
