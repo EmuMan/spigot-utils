@@ -20,7 +20,6 @@ public class Stopwatch {
      */
     public Stopwatch(JavaPlugin plugin) {
         ticks = 0;
-        start();
         // I don't think I can use lambda expressions here unfortunately
         this.runnable = new BukkitRunnable() {
             @Override
@@ -29,6 +28,7 @@ public class Stopwatch {
             }
         };
         this.runnable.runTaskTimer(plugin, 0, 1);
+        start();
     }
 
     /**
