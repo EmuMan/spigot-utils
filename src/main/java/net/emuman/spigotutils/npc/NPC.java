@@ -33,13 +33,17 @@ public class NPC {
     private static final int RENDER_DISTANCE = 50;
 
     private EntityPlayer npc;
+    private DataWatcher dataWatcher;
     protected final JavaPlugin plugin;
     private final Set<Player> displayedFor;
     private final Set<Player> inRenderDistance;
     private final String name;
+    private final org.bukkit.World world;
     private final org.bukkit.inventory.ItemStack[] equipment;
     private static final ArrayList<NPC> npcList = new ArrayList<>();
     private static final JsonParser jsonParser = new JsonParser();
+
+    private static final HashMap<String, String[]> PLAYER_SKIN_CACHE = new HashMap<>();
 
     public enum EquipmentSlot {
         MAIN_HAND,
@@ -53,16 +57,18 @@ public class NPC {
     /**
      * Creates a new NPC.
      *
-     * @param plugin   the plugin using the new NPC.
-     * @param location the location at which to spawn the new NPC.
-     * @param name     the name of the new NPC.
-     * @param skinName the name of the player whose skin should be used on the NPC.
+     * @param plugin        the plugin using the new NPC.
+     * @param location      the location at which to spawn the new NPC.
+     * @param name          the name of the new NPC.
+     * @param skinTexture   the texture value of the skin to be used on the NPC.
+     * @param skinSignature the signature value of the skin to be used on the NPC.
      */
-    public NPC(JavaPlugin plugin, Location location, String name, String skinName) {
+    public NPC(JavaPlugin plugin, Location location, String name, String skinTexture, String skinSignature) {
         this.plugin = plugin;
         this.displayedFor = new HashSet<>();
         this.inRenderDistance = new HashSet<>();
         this.name = name;
+        this.world = location.getWorld();
         this.equipment = new org.bukkit.inventory.ItemStack[6];
 
         if (name.length() > 16) return;
@@ -72,9 +78,11 @@ public class NPC {
         npc = new EntityPlayer(server, world, gameProfile, new PlayerInteractManager(world));
         npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
-        String[] skinProperty = getPlayerSkin(skinName);
-        if (skinProperty != null) {
-            gameProfile.getProperties().put("textures", new Property("textures", skinProperty[0], skinProperty[1]));
+        dataWatcher = npc.getDataWatcher();
+        if (skinTexture != null && skinSignature != null) {
+            gameProfile.getProperties().put("textures", new Property("textures", skinTexture, skinSignature));
+            // https://www.spigotmc.org/threads/get-npc-second-layer.453988/
+            dataWatcher.set(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 255);
         }
 
         npcList.add(this);
@@ -104,7 +112,20 @@ public class NPC {
      * @param name     the name of the new NPC.
      */
     public NPC(JavaPlugin plugin, Location location, String name) {
-        this(plugin, location, name, null);
+        this(plugin, location, name, null, null);
+    }
+
+    /**
+     * Creates a new NPC.
+     *
+     * @param plugin   the plugin using the new NPC.
+     * @param location the location at which to spawn the new NPC.
+     * @param name     the name of the new NPC.
+     * @param skinName the name of the player whose skin should be used on the NPC.
+     */
+    public NPC(JavaPlugin plugin, Location location, String name, String skinName) {
+        // probably not great practice but the function is cached so idc
+        this(plugin, location, name, getPlayerSkin(skinName)[0], getPlayerSkin(skinName)[1]);
     }
 
     /**
@@ -127,6 +148,7 @@ public class NPC {
         connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
         connection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
         connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
+        connection.sendPacket(new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, true));
         // Have to wait a bit before sending this packet or else the skin doesn't load properly.
         new BukkitRunnable() {
             @Override
@@ -213,7 +235,11 @@ public class NPC {
      * @param name the name of the player to get the skin of.
      * @return     a String array containing 1) the skin's texture value, and 2) the skin's texture signature, respectively.
      */
-    private String[] getPlayerSkin(String name) {
+    private static String[] getPlayerSkin(String name) {
+        if (PLAYER_SKIN_CACHE.containsKey(name)) {
+            return PLAYER_SKIN_CACHE.get(name);
+        }
+        String[] result = new String[2];
         try {
             URL profileURL = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
             InputStreamReader profileReader = new InputStreamReader(profileURL.openStream());
@@ -228,10 +254,12 @@ public class NPC {
                     break;
                 }
             }
-            if (property == null) return null;
-            return new String[] {property.get("value").getAsString(), property.get("signature").getAsString()};
+            if (property == null) return result;
+            result = new String[] {property.get("value").getAsString(), property.get("signature").getAsString()};
+            PLAYER_SKIN_CACHE.put(name, result);
+            return result;
         } catch (Exception e) {
-            return null;
+            return result;
         }
     }
 
@@ -257,6 +285,8 @@ public class NPC {
      */
     public boolean isInRenderDistance(Player player) {
         Location playerLocation = player.getLocation();
+        if (playerLocation.getWorld() == null) return false;
+        if (!playerLocation.getWorld().equals(world)) return false;
         Vec3D npcLocation = npc.getPositionVector();
         double dx = playerLocation.getX() - npcLocation.x;
         double dy = playerLocation.getY() - npcLocation.y;
