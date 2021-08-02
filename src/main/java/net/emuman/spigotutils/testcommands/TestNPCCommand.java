@@ -18,7 +18,7 @@ public class TestNPCCommand implements CommandExecutor {
                 NPC npc = new NPC(SpigotUtilsTestPlugin.getPlugin(SpigotUtilsTestPlugin.class),
                         player.getLocation(),
                         ChatColor.GREEN + "" + ChatColor.BOLD + "EmuNPC",
-                        "EmuMan4");
+                        "nohuh");
                 npc.spawnForPlayer(player);
             }
             return true;

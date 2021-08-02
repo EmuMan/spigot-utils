@@ -4,8 +4,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import net.emuman.spigotutils.npc.NPCPacketReader;
-import net.minecraft.server.v1_16_R3.Packet;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import net.minecraft.network.protocol.Packet;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,7 +29,10 @@ public class PacketHandler {
     public static void inject(Player player) {
         if (readers == null) return;
         CraftPlayer craftPlayer = (CraftPlayer) player;
-        Channel channel = craftPlayer.getHandle().playerConnection.networkManager.channel;
+
+        // uhhhh i sure hope this works
+        Channel channel = craftPlayer.getHandle().b.a.k;
+
         channels.put(player.getUniqueId(), channel);
 
         // There is already something listening or something idk

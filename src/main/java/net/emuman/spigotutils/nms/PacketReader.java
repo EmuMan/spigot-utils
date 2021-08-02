@@ -1,6 +1,6 @@
 package net.emuman.spigotutils.nms;
 
-import net.minecraft.server.v1_16_R3.Packet;
+import net.minecraft.network.protocol.Packet;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;

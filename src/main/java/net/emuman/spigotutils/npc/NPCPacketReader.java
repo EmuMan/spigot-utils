@@ -2,11 +2,17 @@ package net.emuman.spigotutils.npc;
 
 import net.emuman.spigotutils.SpigotUtilsTestPlugin;
 import net.emuman.spigotutils.nms.PacketReader;
-import net.minecraft.server.v1_16_R3.Packet;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.PacketPlayInUseEntity;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.logging.Logger;
 
 /**
  * Reads incoming packets. Used by PacketHandler. Should almost never be instantiated by user.
@@ -33,9 +39,15 @@ public class NPCPacketReader extends PacketReader {
     @Override
     public void readPacket(Player player, Packet<?> packet) {
         if (packet.getClass().getSimpleName().equalsIgnoreCase("PacketPlayInUseEntity")) {
-            Object hand = getValue(packet, "d");
-            if (hand != null && hand.toString().equalsIgnoreCase("OFF_HAND")) return;
-            String action = getValue(packet, "action").toString();
+            String action = null;
+            Object interactionType = getValue(packet, "b");
+            try {
+                Method method = interactionType.getClass().getMethod("a");
+                method.setAccessible(true);
+                action = method.invoke(interactionType).toString();
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
             if (action.equalsIgnoreCase("INTERACT_AT")) return;
             boolean isAttack;
             if (action.equalsIgnoreCase("ATTACK")) isAttack = true;

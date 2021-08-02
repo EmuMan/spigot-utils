@@ -7,13 +7,24 @@ import com.google.gson.JsonParser;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.network.syncher.DataWatcherRegistry;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.PlayerInteractManager;
+import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.entity.EnumItemSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_17_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -75,14 +86,14 @@ public class NPC {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         WorldServer world = ((CraftWorld) location.getWorld()).getHandle();
         GameProfile gameProfile = new GameProfile(UUID.randomUUID(), name);
-        npc = new EntityPlayer(server, world, gameProfile, new PlayerInteractManager(world));
+        npc = new EntityPlayer(server, world, gameProfile);
         npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
         dataWatcher = npc.getDataWatcher();
         if (skinTexture != null && skinSignature != null) {
             gameProfile.getProperties().put("textures", new Property("textures", skinTexture, skinSignature));
             // https://www.spigotmc.org/threads/get-npc-second-layer.453988/
-            dataWatcher.set(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 255);
+            dataWatcher.set(new DataWatcherObject<>(17, DataWatcherRegistry.a), (byte) 255);
         }
 
         npcList.add(this);
@@ -144,16 +155,16 @@ public class NPC {
      * @param player the player to spawn the NPC in for.
      */
     private void sendSpawnPackets(Player player) {
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
-        connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, npc));
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
+        connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.a, npc));
         connection.sendPacket(new PacketPlayOutNamedEntitySpawn(npc));
-        connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
+        connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.getYRot() * 256 / 360)));
         connection.sendPacket(new PacketPlayOutEntityMetadata(npc.getId(), dataWatcher, true));
         // Have to wait a bit before sending this packet or else the skin doesn't load properly.
         new BukkitRunnable() {
             @Override
             public void run() {
-                connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER, npc));
+                connection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.e, npc));
             }
         }.runTaskLater(plugin, 50L);
         List<Pair<EnumItemSlot, ItemStack>> equipmentInfo = getEquipmentInfo();
@@ -171,17 +182,17 @@ public class NPC {
     private EnumItemSlot convertToEnumItemSlot(int i) {
         switch (i) {
             case 0:
-                return EnumItemSlot.MAINHAND;
+                return EnumItemSlot.a;
             case 1:
-                return EnumItemSlot.OFFHAND;
+                return EnumItemSlot.b;
             case 2:
-                return EnumItemSlot.FEET;
+                return EnumItemSlot.c;
             case 3:
-                return EnumItemSlot.LEGS;
+                return EnumItemSlot.d;
             case 4:
-                return EnumItemSlot.CHEST;
+                return EnumItemSlot.e;
             default:
-                return EnumItemSlot.HEAD;
+                return EnumItemSlot.f;
         }
     }
 
@@ -214,7 +225,7 @@ public class NPC {
      * @param player the player to despawn the NPC for.
      */
     private void sendDespawnPackets(Player player) {
-        PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+        PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
         connection.sendPacket(new PacketPlayOutEntityDestroy(npc.getId()));
     }
 
@@ -288,9 +299,9 @@ public class NPC {
         if (playerLocation.getWorld() == null) return false;
         if (!playerLocation.getWorld().equals(world)) return false;
         Vec3D npcLocation = npc.getPositionVector();
-        double dx = playerLocation.getX() - npcLocation.x;
-        double dy = playerLocation.getY() - npcLocation.y;
-        double dz = playerLocation.getZ() - npcLocation.z;
+        double dx = playerLocation.getX() - npcLocation.getX();
+        double dy = playerLocation.getY() - npcLocation.getY();
+        double dz = playerLocation.getZ() - npcLocation.getZ();
         return ((int) (dx * dx + dy * dy + dz * dz) < RENDER_DISTANCE * RENDER_DISTANCE);
     }
 
@@ -301,7 +312,7 @@ public class NPC {
         Location oldLocation = new Location(location.getWorld(), npc.locX(), npc.locY(), npc.locZ());
         npc.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
         for (Player player : inRenderDistance) {
-            PlayerConnection connection = ((CraftPlayer) player).getHandle().playerConnection;
+            PlayerConnection connection = ((CraftPlayer) player).getHandle().b;
             if (isTeleport) {
                 connection.sendPacket(new PacketPlayOutEntityTeleport(npc));
             } else {
@@ -312,7 +323,7 @@ public class NPC {
                         (byte) (location.getYaw() * 256 / 360),
                         (byte) (location.getPitch() * 256 / 360),
                         false));
-                connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.yaw * 256 / 360)));
+                connection.sendPacket(new PacketPlayOutEntityHeadRotation(npc, (byte) (npc.getYRot() * 256 / 360)));
             }
         }
     }
