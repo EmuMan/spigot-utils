@@ -53,7 +53,6 @@ public class Sounds {
      * @param noteRate   the rate at which the notes will be played at (in game ticks).
      */
     public static void playSequence(JavaPlugin plugin, Player player, Instrument instrument, Note[] notes, int noteRate) {
-        System.out.println(Arrays.toString(notes));
         new BukkitRunnable() {
             int currentNote = 0;
             @Override

@@ -173,4 +173,10 @@ public class ArmorStandModel extends ArmorStandLocationUser {
         return newLocation;
     }
 
+    public void destroy() {
+        for (ASOLocPair object : objects) {
+            object.aso.destroy();
+        }
+    }
+
 }

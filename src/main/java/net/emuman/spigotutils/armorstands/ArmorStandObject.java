@@ -150,4 +150,8 @@ public class ArmorStandObject extends ArmorStandLocationUser{
         wasChanged = true;
     }
 
+    public void destroy() {
+        armorStand.remove();
+    }
+
 }
